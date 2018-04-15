@@ -1,0 +1,16 @@
+{
+  "name": "pixelcanvasbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jimp": "^0.2.28",
+    "request": "^2.85.0",
+    "request-promise": "^4.2.2"
+  }
+}
