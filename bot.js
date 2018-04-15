@@ -70,7 +70,9 @@ function getIndexedColor(r, g, b){
 }
 
 function drawNext(){
-  var toDraw = drawQueue[0];
+  var pickedIndex = Math.floor(Math.random()*drawQueue.length)
+
+  var toDraw = drawQueue[pickedIndex];
   var color = getIndexedColor(toDraw.r, toDraw.g, toDraw.b)
 
   var absoluteX = TOP_LEFT_X + toDraw.x
@@ -80,14 +82,29 @@ function drawNext(){
 
   sendPixel(absoluteX, absoluteY, color)
     .then(win => {
-      drawQueue.shift()
+      drawQueue.splice(Math.floor(Math.random()*drawQueue.length), 1)
+      console.error('Success:',JSON.stringify(win));
       if(drawQueue.length > 0){
-        setTimeout(drawNext, 5000)
+        setTimeout(drawNext, 1000)
       } else {
         console.log("End of draw :)")
       }
     })
-    .catch(err => setTimeout(drawNext, 8000))
+    .catch(err => {
+      console.error('Error on call statusCode:', err.statusCode);
+
+      var wait = 10000
+      if(err.statusCode == 400 && !err.response.body.success && err.response.body.waitSeconds != undefined){
+        wait = Math.ceil(err.response.body.waitSeconds * 1000)
+      } else if(err.statusCode == 429){
+        console.error('Too early, rate limit exceeded')
+      } else {
+        console.error('Unknown error:', JSON.stringify(err));
+        console.error('Error on call body:', err.response.body);
+      }
+      console.log('Waiting ms :', wait);
+      setTimeout(drawNext, wait)
+    })
 }
 
 Jimp.read("rsc/img.png").then(function (img) {
